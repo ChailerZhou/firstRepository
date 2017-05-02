@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+        
+        <bean id="Farmer" class="maven.charlie.step1.impl.Farmer" />
+        <bean id="Doctor" class="maven.charlie.step1.impl.Doctor" />
+        <bean id="TimeHandler" class="maven.charlie.step1.aop.TimeHandler" />
+        <bean id="LogHandler" class="maven.charlie.step1.aop.LogHandler" />
+        
+        <aop:config>
+            <aop:aspect id="time" ref="TimeHandler" order="1">
+                <aop:pointcut id="addTime" expression="execution(* maven.charlie.step1.PersonAction.wo*(..))" />
+                <aop:before method="printTime" pointcut-ref="addTime" />
+                <aop:after method="printTime" pointcut-ref="addTime" />
+            </aop:aspect>
+            <aop:aspect id="log" ref="LogHandler" order="2">
+                <aop:pointcut id="printLog" expression="execution(* maven.charlie.step1.PersonAction.go*(..))" />
+                <aop:before method="logBefore" pointcut-ref="printLog" />
+                <aop:after method="logAfter" pointcut-ref="printLog" />
+            </aop:aspect>
+        </aop:config>
+</beans>

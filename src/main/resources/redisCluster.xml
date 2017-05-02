@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"  
+   xmlns:context="http://www.springframework.org/schema/context"  
+   xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"  
+   xmlns:aop="http://www.springframework.org/schema/aop"  
+   xsi:schemaLocation="  
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> 
+		 <!-- properties 文件位置 -->
+		 <context:property-placeholder location="classpath:redisCluster.properties" />
+		
+		 <!-- jedisPool 配置  简单配置，其余属性自行查找  org.apache.commons.pool2.impl.GenericObjectPoolConfig 等父类-->
+		 <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		     <property name="maxTotal" value="${pool.maxTotal}" />
+		     <property name="maxIdle" value="${pool.maxIdle}" />
+		     <property name="minIdle" value="${pool.minIdle}" />
+		 </bean>
+		 
+		 <!-- 程序中要使用的操作redis集群的对象 -->
+		 <bean id="jedisClusterClient" class="redis.clients.jedis.JedisCluster">
+		     <!-- 构造方法注入   
+		     节点集合（只写一个就可以，集群中其余的节点会自动加载进来） , 超时时间，最大重连次数，数据池配置对象  
+		  public JedisCluster(Set<HostAndPort> jedisClusterNode, int timeout, int maxRedirections,final GenericObjectPoolConfig poolConfig) -->  
+		     <constructor-arg name="nodes" >
+		          <set>
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host1}"/>
+		                 <constructor-arg name="port" value="${redis.port1}"/>
+		             </bean>
+		             <!--
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host2}"/>
+		                 <constructor-arg name="port" value="${redis.port2}"/>
+		             </bean>
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host3}"/>
+		                 <constructor-arg name="port" value="${redis.port3}"/>
+		             </bean>
+		             
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host4}"/>
+		                 <constructor-arg name="port" value="${redis.port4}"/>
+		             </bean>
+		             
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host5}"/>
+		                 <constructor-arg name="port" value="${redis.port5}"/>
+		             </bean>
+		             <bean class="redis.clients.jedis.HostAndPort">
+		                 <constructor-arg name="host" value="${redis.host6}"/>
+		                 <constructor-arg name="port" value="${redis.port6}"/>
+		             </bean>
+		             -->
+		          </set>
+		     </constructor-arg>
+		     <!-- <constructor-arg name="timeout" value="${redis.timeOut}"/>
+		     <constructor-arg name="maxRedirections" value="${redis.maxRedirections}"/>
+		     -->
+		     <constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
+		 </bean>
+</beans>
